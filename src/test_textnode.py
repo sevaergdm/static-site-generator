@@ -1,5 +1,7 @@
 import unittest
-from textnode import TextType, TextNode, text_node_to_html_node
+
+from textnode import TextNode, TextType, text_node_to_html_node
+
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -8,12 +10,15 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(node, node2)
 
     def test_eq_url(self):
-        node = TextNode("This is a text node with url", TextType.TEXT, "http://someurl.com")
-        node2 = TextNode("This is a text node with url", TextType.TEXT, "http://someurl.com")
+        node = TextNode("This is a text node with url",
+                        TextType.TEXT, "http://someurl.com")
+        node2 = TextNode("This is a text node with url",
+                         TextType.TEXT, "http://someurl.com")
         self.assertEqual(node, node2)
 
     def test_not_eq(self):
-        node = TextNode("This is a text node with url", TextType.TEXT, "http://someurl.com")
+        node = TextNode("This is a text node with url",
+                        TextType.TEXT, "http://someurl.com")
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertNotEqual(node, node2)
 
@@ -21,6 +26,7 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a text node", TextType.BOLD)
         node2 = TextNode("This is a text node", TextType.ITALIC)
         self.assertNotEqual(node, node2)
+
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text(self):

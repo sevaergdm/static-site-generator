@@ -1,5 +1,7 @@
-from textnode import TextNode, TextType
 import re
+
+from textnode import TextNode, TextType
+
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     if not old_nodes:
@@ -12,7 +14,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         else:
             split_nodes = node.text.split(delimiter)
             if len(split_nodes) % 2 == 0:
-                raise Exception(f"Invalid markdown: missing closing '{delimiter}'")
+                raise Exception(
+                    f"Invalid markdown: missing closing '{delimiter}'")
             for i in range(len(split_nodes)):
                 if i % 2 == 0:
                     new_nodes.append(TextNode(split_nodes[i], TextType.TEXT))
@@ -20,13 +23,16 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                     new_nodes.append(TextNode(split_nodes[i], text_type))
     return new_nodes
 
+
 def extract_markdown_images(text):
     pattern = r"!\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
+
 def extract_markdown_links(text):
     pattern = r"\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
+
 
 def split_nodes_image(old_nodes):
     if not old_nodes:
@@ -43,10 +49,12 @@ def split_nodes_image(old_nodes):
                 new_nodes.append(TextNode(sections[0], TextType.TEXT))
             new_nodes.append(TextNode(alt_text, TextType.IMAGE, url))
             if sections[1]:
-                new_nodes.extend(split_nodes_image([TextNode(sections[1], TextType.TEXT)]))
+                new_nodes.extend(split_nodes_image(
+                    [TextNode(sections[1], TextType.TEXT)]))
         else:
             new_nodes.append(node)
     return new_nodes
+
 
 def split_nodes_link(old_nodes):
     if not old_nodes:
@@ -63,7 +71,8 @@ def split_nodes_link(old_nodes):
                 new_nodes.append(TextNode(sections[0], TextType.TEXT))
             new_nodes.append(TextNode(text, TextType.LINK, url))
             if sections[1]:
-                new_nodes.extend(split_nodes_link([TextNode(sections[1], TextType.TEXT)]))
+                new_nodes.extend(split_nodes_link(
+                    [TextNode(sections[1], TextType.TEXT)]))
         else:
             new_nodes.append(node)
     return new_nodes
