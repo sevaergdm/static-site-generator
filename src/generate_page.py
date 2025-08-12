@@ -24,7 +24,7 @@ def generate_page(from_path, template_path, dest_path, basepath="/"):
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", converted_markdown)
     template = template.replace('href="/', f'href="{basepath}')
-    template = template.replace('src="', f'src="{basepath}')
+    template = template.replace('src="/', f'src="{basepath}')
 
     dest_dir_path = os.path.dirname(abs_dest_path)
     if dest_dir_path != "":
@@ -49,7 +49,7 @@ def generate_page_recursive(dir_path_content,
             item_name = os.path.splitext(item)[0]
             item_html = item_name + ".html"
             output_path = os.path.join(abs_dest_dir_path, item_html)
-            generate_page(path, abs_template_path, output_path)
+            generate_page(path, abs_template_path, output_path, basepath)
         elif os.path.isdir(path):
             new_target = os.path.join(abs_dest_dir_path, item)
             if not os.path.exists(new_target):
