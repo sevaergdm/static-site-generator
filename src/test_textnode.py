@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType
 
 
 class TestTextNode(unittest.TestCase):
@@ -26,32 +26,6 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a text node", TextType.BOLD)
         node2 = TextNode("This is a text node", TextType.ITALIC)
         self.assertNotEqual(node, node2)
-
-
-class TestTextNodeToHTMLNode(unittest.TestCase):
-    def test_text(self):
-        node = TextNode("This is a text node", TextType.TEXT)
-        html_node = text_node_to_html_node(node)
-        self.assertEqual(html_node.tag, None)
-        self.assertEqual(html_node.value, "This is a text node")
-
-    def test_text_bold(self):
-        node = TextNode("This is a text node", TextType.BOLD)
-        html_node = text_node_to_html_node(node)
-        self.assertEqual(html_node.tag, "b")
-        self.assertEqual(html_node.value, "This is a text node")
-
-    def test_text_bad_type(self):
-        node = TextNode("This is a text node", "SOMETYPE")
-        with self.assertRaises(Exception) as context:
-            text_node_to_html_node(node)
-        self.assertEqual(str(context.exception), "TextType not recognized")
-
-    def test_text_code(self):
-        node = TextNode("SELECT * FROM table", TextType.CODE)
-        html_node = text_node_to_html_node(node)
-        self.assertEqual(html_node.tag, "code")
-        self.assertEqual(html_node.value, "SELECT * FROM table")
 
 
 if __name__ == "__main__":

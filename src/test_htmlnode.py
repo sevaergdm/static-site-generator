@@ -1,6 +1,9 @@
+import textwrap
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import (HTMLNode, LeafNode, ParentNode, markdown_to_html_node,
+                      text_node_to_html_node)
+from textnode import TextNode, TextType
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -90,6 +93,114 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(parent_node.to_html(),
                          '<a href="https://www.google.com"><p>This is some '
                          'text</p><b>This is some more text</b></a>')
+
+
+class TestMarkdownToHTML(unittest.TestCase):
+    def test_paragraphs(self):
+        md = textwrap.dedent("""
+        This is **bolded** paragraph
+        text in a p
+        tag here
+
+        This is another paragraph with _italic_ text and `code` here
+
+        """)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p>"
+            "<p>This is another paragraph with <i>italic</i> text and <code>"
+            "code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = textwrap.dedent("""
+        ```
+        This is text that _should_ remain
+        the **same** even with inline stuff
+        ```
+        """)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same**"
+            " even with inline stuff\n</code></pre></div>",
+        )
+
+    def test_unordered_list(self):
+        md = textwrap.dedent("""
+        - This **is** an
+        - _unordered_
+        - list
+        """)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>This <b>is</b> an</li><li><i>unordered</i></li>"
+            "<li>list</li></ul></div>"
+        )
+
+    def test_ordered_list(self):
+        md = textwrap.dedent("""
+        1. This **is** an
+        2. _unordered_
+        3. list
+        """)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ol><li>This <b>is</b> an</li><li><i>unordered</i></li>"
+            "<li>list</li></ol></div>"
+        )
+
+    def test_quote(self):
+        md = textwrap.dedent("""
+        > This is a quote
+        > from some famous author
+        > where they say something poignant
+        """)
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a quote from some famous author where "
+            "they say something poignant</blockquote></div>"
+        )
+
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
+    def test_text(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+
+    def test_text_bold(self):
+        node = TextNode("This is a text node", TextType.BOLD)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "b")
+        self.assertEqual(html_node.value, "This is a text node")
+
+    def test_text_bad_type(self):
+        node = TextNode("This is a text node", "SOMETYPE")
+        with self.assertRaises(Exception) as context:
+            text_node_to_html_node(node)
+        self.assertEqual(str(context.exception), "TextType not recognized")
+
+    def test_text_code(self):
+        node = TextNode("SELECT * FROM table", TextType.CODE)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "code")
+        self.assertEqual(html_node.value, "SELECT * FROM table")
 
 
 if __name__ == "__main__":
